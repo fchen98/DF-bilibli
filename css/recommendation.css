@@ -1,0 +1,65 @@
+.bili-dyn-ads,
+.first-screen,
+.banner-link,
+.navbar_pullup,
+.van-popover.van-popper.popover-channe,
+.nav-link-item ~ .nav-link-item,
+.item > a,
+.mini-upload,
+.list-box,
+.item > span > .mini-vip,
+.item > .nav-item.nav-item-message> .t {
+  visibility: hidden !important;
+}
+
+/*In video recommendation*/
+/*New UI*/
+.danmaku-box,
+.slide-ad-exp,
+.recommend-list-v1,
+.bili-comment.browser-pc,
+.ad-report.video-card-ad-small,
+/*Old UI*/  
+.vcd,
+.recommend-list.report-wrap-module.report-scroll-module,
+.bilibili-player-ending-panel,
+.float-nav__btn--fixed,
+#live_recommand_report,
+.ad-report,
+.bpx-player-ending-related,
+/*Home recommendation*/
+.trending,
+.new-home-entry,
+.contact-help,
+.topic-panel,
+.bili-dyn-banner,
+.bili-dyn-live-users,
+.bili-dyn-publishing,
+.bili-dyn-interaction__item,
+.activity-m,
+.b-wrap,
+.video-ad-creative-card {
+  display: none !important;
+}
+
+.bili-banner {
+  margin-bottom: 20px !important;
+  margin-left: auto;
+  margin-right: auto;
+  display: none !important;
+}
+
+.bili-banner.bili-wall{
+  margin-bottom: 20px !important;
+  margin-left: auto;
+  margin-right: auto;
+  display: block !important;
+}
+
+.nav-search-keyword::placeholder{
+  opacity: 0 !important;
+}
+
+.cur-list > .list-box {
+  visibility: visible !important;
+}

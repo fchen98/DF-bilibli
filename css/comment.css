@@ -1,0 +1,8 @@
+/*New UI*/
+.bili-comment.browser-pc,
+/*Old UI*/
+.common,
+.bili-dyn-action.comment{
+    visibility: hidden !important;
+}
+

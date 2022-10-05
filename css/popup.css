@@ -1,0 +1,21 @@
+.checkbox {
+  display: inline-block;
+  vertical-align: top;
+  padding-left: 30px;
+  position: relative;
+}
+
+.checkbox,h3,h2{
+  color: white;
+}
+
+.checkbox input {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+body{
+  width: 200px;
+  background-color: rgb(17, 9, 54);
+}
