@@ -8,18 +8,18 @@
 .mini-upload,
 .list-box,
 .item > span > .mini-vip,
-.item > .nav-item.nav-item-message> .t {
+.item > .nav-item.nav-item-message > .t {
   visibility: hidden !important;
 }
 
-/*In video recommendation*/
-/*New UI*/
+/* In video recommendation */
+/* New UI */
 .danmaku-box,
 .slide-ad-exp,
 .recommend-list-v1,
 .bili-comment.browser-pc,
 .ad-report.video-card-ad-small,
-/*Old UI*/  
+/* Old UI */
 .vcd,
 .recommend-list.report-wrap-module.report-scroll-module,
 .bilibili-player-ending-panel,
@@ -27,7 +27,7 @@
 #live_recommand_report,
 .ad-report,
 .bpx-player-ending-related,
-/*Home recommendation*/
+/* Home recommendation */
 .trending,
 .new-home-entry,
 .contact-help,
@@ -49,17 +49,18 @@
   display: none !important;
 }
 
-.bili-banner.bili-wall{
+.bili-banner.bili-wall {
   margin-bottom: 20px !important;
   margin-left: auto;
   margin-right: auto;
   display: block !important;
 }
 
-.nav-search-keyword::placeholder{
+.nav-search-keyword::placeholder {
   opacity: 0 !important;
 }
 
 .cur-list > .list-box {
   visibility: visible !important;
 }
+

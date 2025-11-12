@@ -1,87 +1,84 @@
-const extensions = /.*\.bilibili\.com\//;
+const BILIBILI_HOST_PATTERN = /https?:\/\/(?:[^\/]+\.)?bilibili\.com\//i;
+const HOST_URL_PATTERNS = [
+  "*://t.bilibili.com/*",
+  "*://www.bilibili.com/*",
+  "*://space.bilibili.com/*",
+  "*://search.bilibili.com/*",
+];
+const STORAGE_DEFAULTS = {
+  recommendation: false,
+  comment: false,
+};
+const CSS_FILES = {
+  recommendation: "css/recommendation.css",
+  comment: "css/comment.css",
+  wall: "css/wall.css",
+};
 
-/*
-function homeClear(){
-  document.getElementsByClassName("nav-search-keyword")[0].placeholder = "";
-  var banner = document.getElementsByClassName("bili-banner")[0];
-  banner.style.backgroundImage = 'url("https://raw.githubusercontent.com/fchen98/DF-bilibli/main/Bilibili_logo_bar.png")';
-  banner.style.backgroundColor = 'white';
-  var clone = banner.cloneNode(true);
-  clone.getElementsByClassName("taper-line")[0].remove();
-  for(var i=0;i<4;i++){
-    banner.parentNode.appendChild(clone.cloneNode(true));
+async function getPreferences() {
+  const stored = await chrome.storage.local.get(STORAGE_DEFAULTS);
+  return { ...STORAGE_DEFAULTS, ...stored };
+}
 
+async function toggleCss(tabId, file, enable) {
+  const action = enable ? chrome.scripting.insertCSS : chrome.scripting.removeCSS;
+  try {
+    await action({
+      files: [file],
+      target: { tabId },
+    });
+  } catch (error) {
+    // Ignore errors caused by tabs that are no longer available or CSS that was not injected yet.
+    if (error?.message?.includes("no tab with id")) {
+      return;
+    }
+    console.warn(`Failed to ${enable ? "insert" : "remove"} CSS ${file} for tab ${tabId}`, error);
   }
 }
-*/
 
-// Event
-chrome.tabs.query({active:true, currentWindow:true},function(tab){
-  chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
-    if (changeInfo.status == "complete"){
-      console.log("background script " + tabId + tab.url + extensions.test(tab.url))
-      chrome.storage.local.get(["recommendation", "comment"], (boxes) => {
-        if(extensions.test(tab.url)){
-          if(boxes.recommendation){
-            chrome.scripting.insertCSS({
-              files: ["css/recommendation.css"],
-              target: { tabId: tabId },
-            });
-          }else{
-            chrome.scripting.insertCSS({
-              files: ["css/wall.css"],
-              target: { tabId: tabId },
-            });}
+async function applyPreferencesToTab(tabId, url) {
+  if (!url || !BILIBILI_HOST_PATTERN.test(url)) {
+    return;
+  }
 
-          if(boxes.comment){
-            chrome.scripting.insertCSS({
-              files: ["css/comment.css"],
-              target: { tabId: tabId },
-            });
-          }
-        }
-        
-      });
-    }
+  const { recommendation, comment } = await getPreferences();
+
+  await toggleCss(tabId, CSS_FILES.recommendation, recommendation);
+  await toggleCss(tabId, CSS_FILES.wall, !recommendation);
+  await toggleCss(tabId, CSS_FILES.comment, comment);
+}
+
+async function applyPreferencesToAllTabs() {
+  const tabs = await chrome.tabs.query({ url: HOST_URL_PATTERNS });
+  await Promise.all(tabs.map((tab) => applyPreferencesToTab(tab.id, tab.url)));
+}
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.storage.local.set(STORAGE_DEFAULTS, () => {
+    applyPreferencesToAllTabs();
   });
 });
-/*
-// When the user clicks on the extension action
-chrome.action.onClicked.addListener(async (tab) => {
-  if (tab.url.match(extensions)) {
-    // We retrieve the action badge to check if the extension is 'ON' or 'OFF'
-    const prevState = await chrome.action.getBadgeText({ tabId: tab.id });
-    // Next state will always be the opposite
-    const nextState = prevState === 'ON' ? 'OFF' : 'ON'
 
-    // Set the action badge to the next state
-    await chrome.action.setBadgeText({
-      tabId: tab.id,
-      text: nextState,
-    });
+chrome.runtime.onStartup.addListener(() => {
+  applyPreferencesToAllTabs();
+});
 
-    if (nextState === "ON") {
-      // Insert the CSS file when the user turns the extension on
-      await chrome.scripting.insertCSS({
-        files: ["css/home.css", "css/dynamic.css", "css/space.css", "css/inVideo.css"],
-        target: { tabId: tab.id },
-      });
-      chrome.scripting.executeScript({
-        func: homeClear,
-        target: { tabId: tab.id },
-      });
-      chrome.scripting.executeScript({
-        func: spaceClear,
-        target: { tabId: tab.id },
-      });
-    } else if (nextState === "OFF") {
-      // Remove the CSS file when the user turns the extension off
-      await chrome.scripting.removeCSS({
-        files: ["css/home.css"],
-        target: { tabId: tab.id },
-      });
-    }
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === "complete") {
+    applyPreferencesToTab(tabId, tab.url);
   }
-}); 
-*/
+});
+
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName !== "local") {
+    return;
+  }
+
+  const hasRelevantChange = "recommendation" in changes || "comment" in changes;
+  if (!hasRelevantChange) {
+    return;
+  }
+
+  applyPreferencesToAllTabs();
+});
 
